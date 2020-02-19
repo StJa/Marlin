@@ -38,6 +38,18 @@
 //
 #define DISABLE_DEBUG
 
+// Testing
+#define SDA_PIN            PB7
+#define SCL_PIN            PB6
+//#define I2C_EEPROM
+//#undef E2END
+//#define E2END 0x7FF // AT24C16N
+
+//
+// Note: MKS Robin board is using SPI2 interface.
+//
+#define SPI_MODULE 2
+
 //
 // Limit Switches
 //
@@ -88,6 +100,7 @@
 #define HEATER_BED_PIN     PA0   // HOT BED
 
 #define FAN_PIN            PB1   // FAN
+#define HOTEND_FAN_PIN       PB0 // Hotend fan on Heater2
 
 //
 // Thermocouples
@@ -120,11 +133,19 @@
  * to let the bootloader init the screen.
  */
 #if ENABLED(FSMC_GRAPHICAL_TFT)
+  //@
+  #define DOGLCD_MOSI -1 // prevent redefine Conditionals_post.h
+  #define DOGLCD_SCK -1
+
   #define FSMC_CS_PIN        PD7    // NE4
   #define FSMC_RS_PIN        PD11   // A0
 
-  #define LCD_RESET_PIN      PC6    // FSMC_RST
-  #define NO_LCD_REINIT             // Suppress LCD re-initialization
+  #define LCD_USE_DMA_FSMC //
+  #define FSMC_DMA_DEV DMA2
+  #define FSMC_DMA_CHANNEL DMA_CH5
+
+  //#define LCD_RESET_PIN      PF6
+  //#define NO_LCD_REINIT             // Suppress LCD re-initialization
 
   #define LCD_BACKLIGHT_PIN  PD13
 
