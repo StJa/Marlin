@@ -57,7 +57,7 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if HAS_GRAPHICAL_LCD && PIN_EXISTS(FSMC_CS)
+#if HAS_GRAPHICAL_LCD && PIN_EXISTS(FSMC_CS) && FSMC_UPSCALE == 2
 
 #include "HAL_LCD_com_defines.h"
 #include "ultralcd_DOGM.h"
@@ -79,16 +79,8 @@
 
 #define X_LO LCD_PIXEL_OFFSET_X
 #define Y_LO LCD_PIXEL_OFFSET_Y
-#if ENABLED(HIGH_RES_480x320)
-  // 3x upscale
-  #define X_HI (X_LO + 3 * WIDTH  - 1)
-  #define Y_HI (Y_LO + 3 * HEIGHT - 1)
-  #define BUFFERSIZE 1152
-#else
   #define X_HI (X_LO + 2 * WIDTH  - 1)
   #define Y_HI (Y_LO + 2 * HEIGHT - 1)
-  #define BUFFERSIZE 512
-#endif
 
 // see https://ee-programming-notepad.blogspot.com/2016/10/16-bit-color-generator-picker.html
 

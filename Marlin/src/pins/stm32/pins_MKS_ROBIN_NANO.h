@@ -51,6 +51,11 @@
 #define SPI_MODULE 2
 
 //
+// Servos
+//
+#define SERVO0_PIN        PA8//PB2 //A$BL
+
+//
 // Limit Switches
 //
 #define X_STOP_PIN        PA15
