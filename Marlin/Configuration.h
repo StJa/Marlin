@@ -508,9 +508,13 @@
   //#define DEFAULT_Kd 440
 
   //@ SapphirePro 50W MonsterHeater (full metal heatbreak, no sock no fans @200° C)
-  #define DEFAULT_Kp 15.36
-  #define DEFAULT_Ki 1.13
-  #define DEFAULT_Kd 52.03
+  //#define DEFAULT_Kp 15.36
+  //#define DEFAULT_Ki 1.13
+  //#define DEFAULT_Kd 52.03
+  //Auto tune
+  #define DEFAULT_Kp 11.56
+  #define DEFAULT_Ki 0.70
+  #define DEFAULT_Kd 47.50
 
 #endif // PIDTEMP
 
@@ -560,9 +564,13 @@
   //#define DEFAULT_bedKd 1675.16
 
   // SapphirePro 24V Heater C5 S50
-  #define DEFAULT_bedKp 45.99
-  #define DEFAULT_bedKi 8.69
-  #define DEFAULT_bedKd 60.84
+  //#define DEFAULT_bedKp 45.99
+  //#define DEFAULT_bedKi 8.69
+  //#define DEFAULT_bedKd 60.84
+  // SapphirePro 24V Heater C12 S60
+  #define DEFAULT_bedKp 41.24
+  #define DEFAULT_bedKi 8.04
+  #define DEFAULT_bedKd 141.06
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
