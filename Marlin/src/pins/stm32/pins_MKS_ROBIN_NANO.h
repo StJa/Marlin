@@ -44,6 +44,10 @@
 //#define I2C_EEPROM
 //#undef E2END
 //#define E2END 0x7FF // AT24C16N
+#define SPI_FLASH_EEPROM_EMULATION
+#define SPI_FLASH_EEPROM_OFFSET 0x700000
+#define SPI_FLASH_DEVICE 2
+#define SPI_FLASH_CS_PIN PB12
 
 //
 // Note: MKS Robin board is using SPI2 interface.
@@ -101,7 +105,7 @@
 // Heaters / Fans
 //
 #define HEATER_0_PIN       PC3   // HEATER1
-#define HEATER_1_PIN       PB0   // HEATER2
+//#define HEATER_1_PIN       PB0   // HEATER2
 #define HEATER_BED_PIN     PA0   // HOT BED
 
 #define FAN_PIN            PB1   // FAN

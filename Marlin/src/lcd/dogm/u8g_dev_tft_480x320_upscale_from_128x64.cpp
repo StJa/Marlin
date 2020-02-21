@@ -822,16 +822,16 @@ uint8_t u8g_dev_tft_480x320_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
             u8g_WriteSequence(u8g, dev, 150, (uint8_t *)buffer);
         #endif
 
-        setWindow(u8g, dev, 14, 185,  77, 224);
+        setWindow(u8g, dev, BUTTOND_X_LO, BUTTON_Y_LO, BUTTOND_X_HI, BUTTON_Y_HI);
         drawImage(buttonD, u8g, dev, 32, 20, ui_color);
 
-        setWindow(u8g, dev, 90, 185, 153, 224);
+        setWindow(u8g, dev, BUTTONA_X_LO, BUTTON_Y_LO, BUTTONA_X_HI, BUTTON_Y_HI);
         drawImage(buttonA, u8g, dev, 32, 20, ui_color);
 
-        setWindow(u8g, dev, 166, 185, 229, 224);
+        setWindow(u8g, dev, BUTTONB_X_LO, BUTTON_Y_LO, BUTTONB_X_HI, BUTTON_Y_HI);
         drawImage(buttonB, u8g, dev, 32, 20, ui_color);
 
-        setWindow(u8g, dev, 242, 185, 305, 224);
+        setWindow(u8g, dev, BUTTONC_X_LO, BUTTON_Y_LO, BUTTONC_X_HI, BUTTON_Y_HI);
         drawImage(buttonC, u8g, dev, 32, 20, ui_color);
       #endif // TOUCH_BUTTONS
 
