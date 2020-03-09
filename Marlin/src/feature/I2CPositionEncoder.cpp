@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -162,17 +162,15 @@ void I2CPositionEncoder::update() {
       if (errIdx == 0) {
         // In order to correct for "error" but avoid correcting for noise and non-skips
         // it must be > threshold and have a difference average of < 10 and be < 2000 steps
-        if (ABS(error) > threshold * planner.settings.axis_steps_per_mm[encoderAxis]
-            && diffSum < 10 * (I2CPE_ERR_ARRAY_SIZE - 1)
-            && ABS(error) < 2000
-        ) {                              // Check for persistent error (skip)
+        if (ABS(error) > threshold * planner.settings.axis_steps_per_mm[encoderAxis] &&
+            diffSum < 10 * (I2CPE_ERR_ARRAY_SIZE - 1) && ABS(error) < 2000) { // Check for persistent error (skip)
           errPrst[errPrstIdx++] = error; // Error must persist for I2CPE_ERR_PRST_ARRAY_SIZE error cycles. This also serves to improve the average accuracy
           if (errPrstIdx >= I2CPE_ERR_PRST_ARRAY_SIZE) {
             float sumP = 0;
             LOOP_L_N(i, I2CPE_ERR_PRST_ARRAY_SIZE) sumP += errPrst[i];
             const int32_t errorP = int32_t(sumP * RECIPROCAL(I2CPE_ERR_PRST_ARRAY_SIZE));
             SERIAL_ECHO(axis_codes[encoderAxis]);
-            SERIAL_ECHOLNPAIR(" : CORRECT ERR ", errorP * planner.steps_to_mm[encoderAxis], "mm");
+            SERIAL_ECHOLNPAIR(" - err detected: ", errorP * planner.steps_to_mm[encoderAxis], "mm; correcting!");
             babystep.add_steps(encoderAxis, -LROUND(errorP));
             errPrstIdx = 0;
           }
@@ -191,8 +189,7 @@ void I2CPositionEncoder::update() {
     if (ABS(error) > I2CPE_ERR_CNT_THRESH * planner.settings.axis_steps_per_mm[encoderAxis]) {
       const millis_t ms = millis();
       if (ELAPSED(ms, nextErrorCountTime)) {
-        SERIAL_ECHO(axis_codes[encoderAxis]);
-        SERIAL_ECHOLNPAIR(" : LARGE ERR ", int(error), "; diffSum=", diffSum);
+        SERIAL_ECHOLNPAIR("Large error on ", axis_codes[encoderAxis], " axis. error: ", (int)error, "; diffSum: ", diffSum);
         errorCount++;
         nextErrorCountTime = ms + I2CPE_ERR_CNT_DEBOUNCE_MS;
       }
@@ -246,14 +243,17 @@ bool I2CPositionEncoder::passes_test(const bool report) {
 }
 
 float I2CPositionEncoder::get_axis_error_mm(const bool report) {
-  const float target = planner.get_axis_position_mm(encoderAxis),
-              actual = mm_from_count(position),
-              diff = actual - target,
-              error = ABS(diff) > 10000 ? 0 : diff; // Huge error is a bad reading
+  float target, actual, error;
+
+  target = planner.get_axis_position_mm(encoderAxis);
+  actual = mm_from_count(position);
+  error = actual - target;
+
+  if (ABS(error) > 10000) error = 0; // ?
 
   if (report) {
     SERIAL_ECHO(axis_codes[encoderAxis]);
-    SERIAL_ECHOLNPAIR(" axis target=", target, "mm; actual=", actual, "mm; err=", error, "mm");
+    SERIAL_ECHOLNPAIR(" axis target: ", target, ", actual: ", actual, ", error : ",error);
   }
 
   return error;
@@ -278,25 +278,21 @@ int32_t I2CPositionEncoder::get_axis_error_steps(const bool report) {
   //convert both 'ticks' into same units / base
   encoderCountInStepperTicksScaled = LROUND((stepperTicksPerUnit * encoderTicks) / encoderTicksPerUnit);
 
-  const int32_t target = stepper.position(encoderAxis);
-  int32_t error = encoderCountInStepperTicksScaled - target;
+  int32_t target = stepper.position(encoderAxis),
+          error = (encoderCountInStepperTicksScaled - target);
 
   //suppress discontinuities (might be caused by bad I2C readings...?)
   const bool suppressOutput = (ABS(error - errorPrev) > 100);
 
-  errorPrev = error;
-
   if (report) {
     SERIAL_ECHO(axis_codes[encoderAxis]);
-    SERIAL_ECHOLNPAIR(" axis target=", target, "; actual=", encoderCountInStepperTicksScaled, "; err=", error);
+    SERIAL_ECHOLNPAIR(" axis target: ", target, ", actual: ", encoderCountInStepperTicksScaled, ", error : ", error);
+    if (suppressOutput) SERIAL_ECHOLNPGM("Discontinuity detected, suppressing error.");
   }
 
-  if (suppressOutput) {
-    if (report) SERIAL_ECHOLNPGM("!Discontinuity. Suppressing error.");
-    error = 0;
-  }
+  errorPrev = error;
 
-  return error;
+  return (suppressOutput ? 0 : error);
 }
 
 int32_t I2CPositionEncoder::get_raw_count() {
